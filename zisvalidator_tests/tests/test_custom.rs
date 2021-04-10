@@ -1,5 +1,4 @@
-use zisvalidator_derive::*;
-use zisvalidator::*;
+use zisvalidator::Validate;
 use zisvalidator::{error::ValidatorError};
 #[macro_use]
 extern crate lazy_static;

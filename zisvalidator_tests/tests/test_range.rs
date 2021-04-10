@@ -1,4 +1,3 @@
-use zisvalidator_derive::*;
 use zisvalidator::*;
 
 pub mod test_custom{
