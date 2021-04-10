@@ -1,0 +1,12 @@
+[package]
+name = "zisvalidator"
+version = "0.1.0"
+authors = ["zz <517669936@qq.com>"]
+license = "MIT OR Apache-2.0"
+description = "A validator for struct and enum"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# zisvalidator_derive = {path = "../zisvalidator_derive"}
