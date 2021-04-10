@@ -9,4 +9,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# zisvalidator_derive = {path = "../zisvalidator_derive"}
+zisvalidator_derive = {path = "../zisvalidator_derive",optional = true}
+
+[features]
+derive = ["zisvalidator_derive"]

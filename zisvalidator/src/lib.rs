@@ -44,4 +44,7 @@ pub trait ValidateLength{
     fn len(&self) -> usize;
 }
 
+#[cfg(feature = "derive")]
+pub use zisvalidator_derive::Validate;
+
 
