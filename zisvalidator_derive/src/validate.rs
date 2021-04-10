@@ -78,8 +78,19 @@ fn validate_container(cont:&ast::Container) -> TokenStream{
 
     let custom_block = match custom{
         Some(custom) => {
-            quote! {
-                #custom(&self.0)?;
+            match &cont.data{
+                Data::Struct(style,fields) if *style == Style::Newtype || *style == Style::Tuple =>{
+                    let mut tokenstream = TokenStream::new();
+                    for field in fields{
+                        let member = &field.member;
+                        tokenstream.extend(quote! {
+                            #custom(&self.#member)?;
+                        });
+                    }
+                    tokenstream
+                    
+                },
+                _ =>{TokenStream::new()}
             }
         },
         None => TokenStream::new()
