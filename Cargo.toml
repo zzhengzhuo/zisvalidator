@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "zisvalidator_derive",
+    "zisvalidator_tests",
+    "zisvalidator"
+]

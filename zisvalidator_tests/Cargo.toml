@@ -1,0 +1,12 @@
+[package]
+name = "zisvalidator_tests"
+version = "0.1.0"
+authors = ["zz <517669936@qq.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+zisvalidator_derive = {path = "../zisvalidator_derive"}
+zisvalidator = {path = "../zisvalidator"}
+lazy_static = "1.4"
