@@ -1,6 +1,6 @@
 [package]
 name = "zisvalidator"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["zz <517669936@qq.com>"]
 license = "MIT OR Apache-2.0"
 description = "A validator for struct and enum"
