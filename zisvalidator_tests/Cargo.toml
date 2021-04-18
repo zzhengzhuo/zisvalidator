@@ -1,6 +1,6 @@
 [package]
 name = "zisvalidator_tests"
-version = "0.1.0"
+version = "0.1.4"
 authors = ["zz <517669936@qq.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -8,5 +8,5 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zisvalidator = {path = "../zisvalidator",features = ["derive"],version = "0.1"}
+zisvalidator = {path = "../zisvalidator",features = ["derive"],version = "0.1.4"}
 lazy_static = "1.4"
