@@ -47,4 +47,12 @@ pub trait ValidateLength{
 #[cfg(feature = "derive")]
 pub use zisvalidator_derive::Validate;
 
+#[macro_export]
+macro_rules! validator_error{
+    ($field:expr,$attr:expr,$value:expr) =>{
+        {
+            ::std::format!("invalid `{}`: expected {} `{:?}`",$field,$attr,$value)
+        }
+    }
+}
 

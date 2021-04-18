@@ -105,8 +105,7 @@ fn validate_container(cont:&ast::Container) -> TokenStream{
                         let member = &field.member;
                         tokenstream.extend(quote! {
                             if !(#range).contains(&self.#member){
-                                let message = format!("invalid {:?}: expect range `{:?}`",#ident,#range);
-                                return Err(::zisvalidator::error::ValidatorError{message});
+                                return Err(::zisvalidator::error::ValidatorError{message: ::zisvalidator::validator_error!(#ident,"range",#range)});
                             }
                         });
                     }
@@ -198,19 +197,16 @@ fn validate_variant(variant:&ast::Variant,params:&Parameters) -> TokenStream {
         ast::Style::Tuple => {
             let ident = &variant.ident.to_string();
             let field = variant.fields.iter().enumerate()
-            .map(|(i,field)| {
+            .map(|(i,_field)| {
                 let i = syn::Ident::new(&format!("__field{}", i), Span::call_site());
-                let custom = match &field.attrs.custom{
+                let custom = match &variant.attrs.custom{
                     Some(custom) => quote! {#custom(&#i)?;},
                     None => TokenStream::new(),
                 };
-                let range = match &field.attrs.range{
+                let range = match &variant.attrs.range{
                     Some(range) => quote! {
-                        quote!{
-                            if !(#range).contains(#i){
-                                let message = format!("invalid {:?}: expect range {}",#ident,range);
-                                return Err(::zisvalidator::error::ValidatorError{message});
-                            }
+                        if !(#range).contains(#i){
+                            return Err(::zisvalidator::error::ValidatorError{message: ::zisvalidator::validator_error!(#ident,"range",#range)});
                         }
                     },
                     None => TokenStream::new(),
@@ -248,8 +244,7 @@ fn validate_new_type(ident:&syn::Ident,attr:&attr::Variant) -> TokenStream{
         Some(range) => {
             quote!{
                 if !(#range).contains(__field0){
-                    let message = format!("invalid {:?}: expect range {:?}",#ident,#range);
-                    return Err(::zisvalidator::error::ValidatorError{message});
+                    return Err(::zisvalidator::error::ValidatorError{message: ::zisvalidator::validator_error!(#ident,"range",#range)});
                 }
             }
         },
@@ -264,6 +259,10 @@ fn validate_new_type(ident:&syn::Ident,attr:&attr::Variant) -> TokenStream{
 fn validate_fields(fields:&[ast::Field],is_self:bool) -> TokenStream{
     let field = fields.iter().map(|field|{
         let member = get_member(&field.member, is_self);
+        let ident_str = match &field.member{
+            Member::Named(i) => i.to_string(),
+            Member::Unnamed(i) => i.index.to_string(),
+        };
         let custom = match &field.attrs.custom{
             Some(custom) =>{
                 quote! {
@@ -278,8 +277,7 @@ fn validate_fields(fields:&[ast::Field],is_self:bool) -> TokenStream{
             Some(range) => {
                 quote!{
                     if !(#range).contains(#member){
-                        let message = format!("invalid {:?}: expect range `{:?}`",#member,#range);
-                        return Err(::zisvalidator::error::ValidatorError{message});
+                        return Err(::zisvalidator::error::ValidatorError{message: ::zisvalidator::validator_error!(#ident_str,"range",#range)});
                     }
                 }
             },
