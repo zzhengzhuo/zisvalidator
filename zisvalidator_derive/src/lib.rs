@@ -1,14 +1,14 @@
 //! # Zisvalidator Derive
 //!
 //! Provide Zisvalidator derive macro
-//! 
+//!
 //! ```rust
 //! use zisvalidator_derive::Validate;
 //! #[derive(Validate)]
 //! struct S;
 //! fn main{}
 //! ```
-//! 
+//!
 //! # Validate for Struct and Enum
 //! ```rust
 //! #[derive(Validate)]
@@ -19,9 +19,9 @@
 //!
 //! #[derive(Validate)]
 //! struct S{                       //validate struct with fields
-//!     str:String 
+//!     str:String
 //! }
-//! 
+//!
 //! #[derive(Validate)]
 //! enum E{                         //validate enum
 //!     S(String),                  //validate tuple varient with 1 element
@@ -31,10 +31,10 @@
 //!     }
 //! }
 //! ```
-//! 
+//!
 //! # Usage
-//! 
-//! ## Validate Attribute Categories 
+//!
+//! ## Validate Attribute Categories
 //! ```
 //! #[derive(Validate)]
 //! #[validate(attr = "foo")]          //<-- Container Attribute
@@ -51,12 +51,10 @@
 //! ```
 //!
 //! ## Container Attribute
-//! 
+//!
 //! ### Schema
-//! 
+//!
 //! - #[validate(schema = "path")]
-//! 
-//! 
 //!
 //!
 //!
@@ -65,7 +63,8 @@
 //!
 //!
 //!
-
+//!
+//!
 
 #[macro_use]
 extern crate quote;
@@ -75,31 +74,28 @@ extern crate syn;
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
-use syn::{parse_macro_input,DeriveInput};
+use syn::{parse_macro_input, DeriveInput};
 
 mod ast;
 mod attr;
+mod check;
 mod error;
 mod symbol;
 mod validate;
-mod check;
-
 
 #[proc_macro_derive(Validate, attributes(validate))]
 pub fn derive_validate(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 
-    validate::expand_derive_validate(&input).unwrap_or_else(to_compile_errors)
-    .into()
+    validate::expand_derive_validate(&input)
+        .unwrap_or_else(to_compile_errors)
+        .into()
 }
 
 fn to_compile_errors(errors: Vec<syn::Error>) -> proc_macro2::TokenStream {
     let compile_errors = errors.iter().map(syn::Error::to_compile_error);
     quote!(#(#compile_errors)*)
 }
-
-
-
 
 #[cfg(test)]
 mod tests {

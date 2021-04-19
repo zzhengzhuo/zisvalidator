@@ -4,12 +4,11 @@ use syn::{Ident, Path};
 #[derive(Debug)]
 pub struct Symbol(&'static str);
 
-pub const VALIDATE:Symbol = Symbol("validate");
-pub const CUSTOM:Symbol = Symbol("custom");
-pub const RANGE:Symbol = Symbol("range");
-pub const SCHEMA:Symbol = Symbol("schema");
-pub const MESSAGE:Symbol = Symbol("message");
-
+pub const VALIDATE: Symbol = Symbol("validate");
+pub const CUSTOM: Symbol = Symbol("custom");
+pub const RANGE: Symbol = Symbol("range");
+pub const SCHEMA: Symbol = Symbol("schema");
+pub const MESSAGE: Symbol = Symbol("message");
 
 impl PartialEq<Symbol> for Ident {
     fn eq(&self, word: &Symbol) -> bool {

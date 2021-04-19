@@ -26,7 +26,7 @@ pub enum Data<'a> {
     // Enum(Vec<Variant<'a>>),
     // Struct(Style, Vec<Field<'a>>),
     Enum(Vec<Variant<'a>>),
-    Struct(Style,Vec<Field<'a>>),
+    Struct(Style, Vec<Field<'a>>),
 }
 
 /// A variant of an enum.
@@ -48,8 +48,7 @@ pub struct Field<'a> {
     // pub original: &'a syn::Field,
 }
 
-#[derive(Copy, Clone,PartialEq)]
-#[derive(Debug)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub enum Style {
     /// Named fields.
     Struct,
@@ -60,23 +59,18 @@ pub enum Style {
     /// No fields.
     Unit,
 }
- 
-impl<'a> Container<'a>{
-    pub fn from_ast(
-        error:&Error,
-        item: &'a syn::DeriveInput,
-    ) -> Option<Self>{
+
+impl<'a> Container<'a> {
+    pub fn from_ast(error: &Error, item: &'a syn::DeriveInput) -> Option<Self> {
         let ident = item.ident.clone();
         let attrs = attr::Container::from_ast(error, &item);
         let data = match &item.data {
-            syn::Data::Enum(data) => {
-                Data::Enum(enum_from_ast(error, &data.variants))
-            },
+            syn::Data::Enum(data) => Data::Enum(enum_from_ast(error, &data.variants)),
             syn::Data::Struct(data) => {
                 // struct_from_ast(error, &data.fields);
                 // Data::Struct(data)
-                let (style,fields) = struct_from_ast(error, &data.fields);
-                Data::Struct(style,fields)
+                let (style, fields) = struct_from_ast(error, &data.fields);
+                Data::Struct(style, fields)
             }
             syn::Data::Union(_) => {
                 error.push_span_error(item, "Validate does not support for unions");
@@ -84,11 +78,15 @@ impl<'a> Container<'a>{
             }
         };
         let generics = &item.generics;
-        if error.errors.borrow().is_empty(){
-            Some(Container{
-                ident,data,generics,attrs,original:item
+        if error.errors.borrow().is_empty() {
+            Some(Container {
+                ident,
+                data,
+                generics,
+                attrs,
+                original: item,
             })
-        }else{
+        } else {
             None
         }
     }
@@ -101,8 +99,7 @@ fn enum_from_ast<'a>(
         .iter()
         .map(|variant| {
             let attrs = attr::Variant::from_ast(error, variant);
-            let (style, fields) =
-                struct_from_ast(error, &variant.fields);
+            let (style, fields) = struct_from_ast(error, &variant.fields);
             Variant {
                 ident: variant.ident.clone(),
                 attrs,
@@ -114,23 +111,13 @@ fn enum_from_ast<'a>(
         .collect()
 }
 
-fn struct_from_ast<'a>(
-    errors: &Error,
-    fields: &'a syn::Fields,
-) -> (Style, Vec<Field<'a>>) {
+fn struct_from_ast<'a>(errors: &Error, fields: &'a syn::Fields) -> (Style, Vec<Field<'a>>) {
     match fields {
-        syn::Fields::Named(fields) => (
-            Style::Struct,
-            fields_from_ast(errors, &fields.named),
-        ),
-        syn::Fields::Unnamed(fields) if fields.unnamed.len() == 1 => (
-            Style::Newtype,
-            fields_from_ast(errors, &fields.unnamed),
-        ),
-        syn::Fields::Unnamed(fields) => (
-            Style::Tuple,
-            fields_from_ast(errors, &fields.unnamed),
-        ),
+        syn::Fields::Named(fields) => (Style::Struct, fields_from_ast(errors, &fields.named)),
+        syn::Fields::Unnamed(fields) if fields.unnamed.len() == 1 => {
+            (Style::Newtype, fields_from_ast(errors, &fields.unnamed))
+        }
+        syn::Fields::Unnamed(fields) => (Style::Tuple, fields_from_ast(errors, &fields.unnamed)),
         syn::Fields::Unit => (Style::Unit, Vec::new()),
     }
 }
