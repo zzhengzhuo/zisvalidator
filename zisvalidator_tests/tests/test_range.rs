@@ -24,6 +24,11 @@ enum ValidateEnum {
         n: i32,
     },
 }
+
+#[derive(Validate, Default)]
+#[validate(range = "2..")]
+struct ValidateSeq(Vec<i32>);
+
 type ValidatorResult = Result<(), ValidatorError>;
 
 lazy_static! {
@@ -37,6 +42,8 @@ lazy_static! {
     static ref VALIDATE_ENUM_TUPLE_SUCC: ValidateEnum = ValidateEnum::Tuple(3, 3);
     static ref VALIDATE_ENUM_FIELDS_FAIL: ValidateEnum = ValidateEnum::Fields { n: 1 };
     static ref VALIDATE_ENUM_FIELDS_SUCC: ValidateEnum = ValidateEnum::Fields { n: 3 };
+    static ref VALIDATE_SEQ_SUCC: ValidateSeq = ValidateSeq(vec![3,4,5]);
+    static ref VALIDATE_SEQ_FAIL: ValidateSeq = ValidateSeq(vec![3,1,5]);
 }
 fn validator_error<T: std::fmt::Debug>(field: &str, attr: &str, value: T) -> ValidatorError {
     ValidatorError {
@@ -91,6 +98,20 @@ mod test_range {
             );
             assert_eq!(
                 VALIDATE_ENUM_FIELDS_SUCC.validate(),
+                ValidatorResult::Ok(())
+            );
+        }
+    }
+    pub mod test_seq {
+        use super::*;
+        #[test]
+        fn test_seq() {
+            assert_eq!(
+                VALIDATE_SEQ_FAIL.validate(),
+                ValidatorResult::Err(validator_error("ValidateSeq", "range", 2..))
+            );
+            assert_eq!(
+                VALIDATE_SEQ_SUCC.validate(),
                 ValidatorResult::Ok(())
             );
         }
