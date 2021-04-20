@@ -96,7 +96,7 @@ fn validate_container(cont: &ast::Container) -> TokenStream {
                     let member = get_member(&field.member, true);
                     let ty = &field.ty;
                     tokenstream.extend(quote! {
-                            <#ty as ::zisvalidator::ValidateRange>::validate_range(#member,#ident,&(#range))?;
+                            <#ty as ::zisvalidator::ValidateRange<_,_,_>>::validate_range(#member,#ident,&(#range))?;
                         });
                 }
                 tokenstream
@@ -188,7 +188,7 @@ fn validate_variant(variant: &ast::Variant, params: &Parameters) -> TokenStream 
                 let ty = &field.ty;
                 let range = match &variant.attrs.range{
                     Some(range) => quote! {
-                        <#ty as ::zisvalidator::ValidateRange>::validate_range(#i,#ident,&(#range))?;
+                        <#ty as ::zisvalidator::ValidateRange<_,_,_>>::validate_range(#i,#ident,&(#range))?;
                     },
                     None => TokenStream::new(),
                 };
@@ -222,7 +222,7 @@ fn validate_new_type(ident: &syn::Ident, ty: &syn::Type, attr: &attr::Variant) -
     let range = match &attr.range {
         Some(range) => {
             quote! {
-                <#ty as ::zisvalidator::ValidateRange>::validate_range(__field0,#ident,&(#range))?;
+                <#ty as ::zisvalidator::ValidateRange<_,_,_>>::validate_range(__field0,#ident,&(#range))?;
             }
         }
         None => TokenStream::new(),
@@ -254,7 +254,7 @@ fn validate_fields(fields: &[ast::Field], is_self: bool) -> TokenStream {
         let range = match &field.attrs.range{
             Some(range) => {
                 quote!{
-                    <#ty as ::zisvalidator::ValidateRange>::validate_range(#member,#ident_str,&(#range))?;
+                    <#ty as ::zisvalidator::ValidateRange<_,_,_>>::validate_range(#member,#ident_str,&(#range))?;
                 }
             },
             None => TokenStream::new(),

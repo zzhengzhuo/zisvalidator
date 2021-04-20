@@ -39,8 +39,6 @@ pub trait Validate {
     fn validate(&self) -> Result<(), error::ValidatorError>;
 }
 
-use std::ops::Range;
-
 #[cfg(feature = "derive")]
 pub use zisvalidator_derive::Validate;
 
@@ -51,11 +49,12 @@ macro_rules! validator_error {
     }};
 }
 
-pub trait ValidateRange {
-    fn validate_range<T, R, Idx>(&self, field: T, range: &R) -> Result<(), error::ValidatorError>
-    where
-        T: std::fmt::Display,
-        R: std::ops::RangeBounds<Idx> + std::fmt::Debug,
-        Idx: PartialOrd<Idx> + PartialOrd<Self> + std::fmt::Debug,
-        Self: PartialOrd<Idx>;
+pub trait ValidateRange<T, R, Idx> 
+where
+    T: std::fmt::Display,
+    R: std::ops::RangeBounds<Idx> + std::fmt::Debug,
+    Idx: PartialOrd<Idx> + std::fmt::Debug,
+    {
+    fn validate_range(&self, field: T, range: &R) -> Result<(), error::ValidatorError>;
+    
 }
