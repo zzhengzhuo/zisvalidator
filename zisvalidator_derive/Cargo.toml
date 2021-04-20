@@ -1,6 +1,6 @@
 [package]
 name = "zisvalidator_derive"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["zz <517669936@qq.com>"]
 edition = "2018"
 description = "Derive macro for zisvalidator"
