@@ -31,6 +31,10 @@ enum E{                         //validate enum
 }
 ```
 
+### Validate for sequence
+
+Validate for sequence like std::Vec which implement trait IntoIter.
+
 ### Validate Arrribute
 
 #### Container Attribute
