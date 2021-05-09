@@ -7,7 +7,30 @@ Reference to [Serde] and [Validator].
 [Serde]: https://docs.serde.rs/serde/index.html
 [Validator]: https://github.com/Keats/validator
 
+## Install
+
+```rust
+zisvalidator = {version = "0.1.6",features = ["derive"]}
+```
+
 ## EXAMPLE
+
+### Short Example
+
+```rust
+use zisvalidator::*;
+
+const LOW_STR: &str = "2";
+
+#[derive(Validate)]
+struct ValidateStruct<'a> {
+    #[validate(range = "LOW_STR..")]
+    s: &'a str,
+    #[validate(seq_range = "&LOW_STR..")]
+    seq: Vec<&'a str>
+}
+
+```
 
 ### Validate for Struct and Enum
 
@@ -31,10 +54,6 @@ enum E{                         //validate enum
 }
 ```
 
-### Validate for sequence
-
-Validate for sequence like std::Vec which implement trait IntoIter.
-
 ### Validate Arrribute
 
 #### Container Attribute
@@ -49,13 +68,21 @@ Validate for sequence like std::Vec which implement trait IntoIter.
 
 * #[validate(range = "start..end")]
 
-    Valid for tuple struct.Validate for elements' range.
+    Valid for tuple struct.Validate range for elements.
+
+* #[validate(seq_range = "start..end")]
+
+    Valid for tuple struct.Validate range for elements which implement `IntoIterator` like `std::vec::Vec`.
 
 #### Field Attribute
 
 * #[validate(range = "start..end")]
 
     Validate for fields' range.
+
+* #[validate(seq_range = "start..end")]
+
+    Validate range for fields which implement `IntoIterator` like `std::vec::Vec`.
 
 * #[validate(custom = "foo")]
 
@@ -66,6 +93,10 @@ Validate for sequence like std::Vec which implement trait IntoIter.
 * #[validate(range = "start..end")]
 
     Validate for variants' range.
+
+* #[validate(seq_range = "start..end")]
+
+    Validate range for variants which implement `IntoIterator` like `std::vec::Vec`.
 
 * #[validate(custom = "foo")]
 
