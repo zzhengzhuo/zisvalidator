@@ -49,12 +49,12 @@ macro_rules! validator_error {
     }};
 }
 
-pub trait ValidateRange<T, R, Idx> 
-where
-    T: std::fmt::Display,
-    R: std::ops::RangeBounds<Idx> + std::fmt::Debug,
-    Idx: PartialOrd<Idx> + std::fmt::Debug,
-    {
-    fn validate_range(&self, field: T, range: &R) -> Result<(), error::ValidatorError>;
-    
+pub trait ValidateRange<F:?Sized, R,Idx:?Sized>
+{
+    fn validate_range(&self, field: &F, range: &R) -> Result<(), error::ValidatorError>;
+}
+
+pub trait ValidateSeqRange<F:?Sized, R,Idx:?Sized>
+{
+    fn validate_seq_range(self, field: &F, range: &R) -> Result<(), error::ValidatorError>;
 }

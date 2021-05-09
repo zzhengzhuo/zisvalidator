@@ -106,10 +106,30 @@ fn validate_container(cont: &ast::Container) -> TokenStream {
         None => TokenStream::new(),
     };
 
+    let seq_range = match &cont.attrs.seq_range {
+        Some(seq_range) => match &cont.data {
+            Data::Struct(style, fields) if *style == Style::Newtype || *style == Style::Tuple => {
+                let mut tokenstream = TokenStream::new();
+                let ident = &cont.ident.to_string();
+                for field in fields {
+                    let member = get_member(&field.member, true);
+                    let ty = &field.ty;
+                    tokenstream.extend(quote! {
+                            <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#member,#ident,&(#seq_range))?;
+                        });
+                }
+                tokenstream
+            }
+            _ => TokenStream::new(),
+        },
+        None => TokenStream::new(),
+    };
+
     let block = quote! {
         #schema_block
         #custom_block
         #range
+        #seq_range
     };
 
     block.into()
@@ -152,20 +172,20 @@ fn validate_variant(variant: &ast::Variant, params: &Parameters) -> TokenStream 
         }
         ast::Style::Newtype => {
             quote! {
-                #ident::#inner_ident (ref __field0)
+                #ident::#inner_ident (__field0)
             }
         }
         ast::Style::Tuple => {
             let field_names = (0..variant.fields.len())
                 .map(|i| syn::Ident::new(&format!("__field{}", i), Span::call_site()));
             quote! {
-                #ident::#inner_ident (#(ref #field_names),*)
+                #ident::#inner_ident (#(#field_names),*)
             }
         }
         ast::Style::Struct => {
             let members = variant.fields.iter().map(|f| &f.member);
             quote! {
-                #ident::#inner_ident { #(ref #members),* }
+                #ident::#inner_ident { #(#members),* }
             }
         }
     };
@@ -192,9 +212,16 @@ fn validate_variant(variant: &ast::Variant, params: &Parameters) -> TokenStream 
                     },
                     None => TokenStream::new(),
                 };
+                let seq_range = match &variant.attrs.seq_range {
+                    Some(seq_range) => quote! {
+                            <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#i,#ident,&(#seq_range))?;
+                    },
+                    None => TokenStream::new(),
+                };
                 quote!{
                     #custom
                     #range
+                    #seq_range
                 }
             });
             quote! {
@@ -227,9 +254,18 @@ fn validate_new_type(ident: &syn::Ident, ty: &syn::Type, attr: &attr::Variant) -
         }
         None => TokenStream::new(),
     };
+    let seq_range = match &attr.seq_range {
+        Some(seq_range) => {
+            quote! {
+                <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(__field0,#ident,&(#seq_range))?;
+            }
+        }
+        None => TokenStream::new(),
+    };
     quote! {
         #custom
         #range
+        #seq_range
     }
 }
 
@@ -259,9 +295,18 @@ fn validate_fields(fields: &[ast::Field], is_self: bool) -> TokenStream {
             },
             None => TokenStream::new(),
         };
+        let seq_range = match &field.attrs.seq_range{
+            Some(seq_range) => {
+                quote!{
+                    <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#member,#ident_str,&(#seq_range))?;
+                }
+            },
+            None => TokenStream::new(),
+        };
         quote! {
             #custom
             #range
+            #seq_range
         }
     }).collect::<Vec<_>>();
     quote! {

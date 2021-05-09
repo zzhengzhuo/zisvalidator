@@ -61,6 +61,7 @@ pub struct Container {
     pub schema: Option<ExprPath>,
     pub custom: Option<ExprPath>,
     pub range: Option<ExprRange>,
+    pub seq_range: Option<ExprRange>,
 }
 
 impl Container {
@@ -68,6 +69,8 @@ impl Container {
         let mut schema = Attr::none(SCHEMA);
         let mut custom = Attr::none(CUSTOM);
         let mut range = Attr::none(RANGE);
+        let mut seq_range = Attr::none(SEQ_RANGE);
+
         for meta_item in item
             .attrs
             .iter()
@@ -134,6 +137,25 @@ impl Container {
                         range.set(error, litstr, expr);
                     }
                 }
+                Meta(NameValue(n)) if n.path == SEQ_RANGE => {
+                    let litstr = if let syn::Lit::Str(litstr) = &n.lit {
+                        litstr
+                    } else {
+                        error.push_span_error(
+                            &n.lit,
+                            format!(
+                                "expected validate {} attribute to be a string: `{} = \"...\"`",
+                                SEQ_RANGE, SEQ_RANGE
+                            ),
+                        );
+                        continue;
+                    };
+                    if let Ok(expr) = litstr.parse::<ExprRange>().map_err(|_| {
+                        error.push_span_error(litstr, format!("failed to parse path: {:?}", litstr))
+                    }) {
+                        seq_range.set(error, litstr, expr);
+                    }
+                }
                 Meta(meta_item) => {
                     let path = meta_item
                         .path()
@@ -157,6 +179,7 @@ impl Container {
             schema: schema.value,
             custom: custom.value,
             range: range.value,
+            seq_range:seq_range.value,
         }
     }
 }
@@ -184,11 +207,13 @@ fn get_validate_meta_items(
 pub struct Field {
     pub custom: Option<ExprPath>,
     pub range: Option<syn::ExprRange>,
+    pub seq_range:Option<syn::ExprRange>,
 }
 impl Field {
     pub fn from_ast(error: &Error, field: &syn::Field) -> Self {
         let mut custom = Attr::none(CUSTOM);
         let mut range = Attr::none(RANGE);
+        let mut seq_range = Attr::none(SEQ_RANGE);
 
         for meta_item in field
             .attrs
@@ -237,6 +262,25 @@ impl Field {
                         range.set(error, litstr, exprrange);
                     }
                 }
+                Meta(NameValue(n)) if n.path == SEQ_RANGE => {
+                    let litstr = if let syn::Lit::Str(litstr) = &n.lit {
+                        litstr
+                    } else {
+                        error.push_span_error(
+                            &n.lit,
+                            format!(
+                                "expected validate {} attribute to be a string: `{} = \"...\"`",
+                                SEQ_RANGE, SEQ_RANGE
+                            ),
+                        );
+                        continue;
+                    };
+                    if let Ok(exprrange) = litstr.parse::<syn::ExprRange>().map_err(|_| {
+                        error.push_span_error(litstr, format!("failed to parse path: {:?}", litstr))
+                    }) {
+                        seq_range.set(error, litstr, exprrange);
+                    }
+                }
                 attr => {
                     error.push_span_error(&attr, format!("invalid validate attribute",));
                 }
@@ -245,6 +289,7 @@ impl Field {
         Field {
             custom: custom.get(),
             range: range.get(),
+            seq_range:seq_range.get(),
         }
     }
 }
@@ -253,12 +298,14 @@ impl Field {
 pub struct Variant {
     pub custom: Option<ExprPath>,
     pub range: Option<ExprRange>,
+    pub seq_range: Option<ExprRange>,
 }
 
 impl Variant {
     pub fn from_ast(error: &Error, variant: &syn::Variant) -> Self {
         let mut custom = Attr::none(CUSTOM);
         let mut range = Attr::none(RANGE);
+        let mut seq_range = Attr::none(SEQ_RANGE);
         for meta_item in variant
             .attrs
             .iter()
@@ -305,6 +352,25 @@ impl Variant {
                         range.set(error, litstr, expr);
                     }
                 }
+                Meta(NameValue(n)) if n.path == SEQ_RANGE => {
+                    let litstr = if let syn::Lit::Str(litstr) = &n.lit {
+                        litstr
+                    } else {
+                        error.push_span_error(
+                            &n.lit,
+                            format!(
+                                "expected validate {} attribute to be a string: `{} = \"...\"`",
+                                SEQ_RANGE, SEQ_RANGE
+                            ),
+                        );
+                        continue;
+                    };
+                    if let Ok(expr) = litstr.parse::<ExprRange>().map_err(|_| {
+                        error.push_span_error(litstr, format!("failed to parse path: {:?}", litstr))
+                    }) {
+                        seq_range.set(error, litstr, expr);
+                    }
+                }
                 attr => {
                     error.push_span_error(&attr, format!("invalid validate attribute",));
                 }
@@ -313,6 +379,7 @@ impl Variant {
         Variant {
             custom: custom.value,
             range: range.value,
+            seq_range:seq_range.value,
         }
     }
 }
