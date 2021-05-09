@@ -6,6 +6,8 @@ license = "MIT OR Apache-2.0"
 description = "A validator for struct and enum"
 edition = "2018"
 repository = "https://github.com/zzhengzhuo/zisvalidator.git"
+homepage = "https://github.com/zzhengzhuo/zisvalidator.git"
+keywords = ["validator", "validate"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
