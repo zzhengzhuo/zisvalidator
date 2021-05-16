@@ -115,7 +115,7 @@ fn validate_container(cont: &ast::Container) -> TokenStream {
                     let member = get_member(&field.member, true);
                     let ty = &field.ty;
                     tokenstream.extend(quote! {
-                            <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#member,#ident,&(#seq_range))?;
+                            <#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#member,#ident,&(#seq_range))?;
                         });
                 }
                 tokenstream
@@ -214,7 +214,7 @@ fn validate_variant(variant: &ast::Variant, params: &Parameters) -> TokenStream 
                 };
                 let seq_range = match &variant.attrs.seq_range {
                     Some(seq_range) => quote! {
-                            <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#i,#ident,&(#seq_range))?;
+                            <#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#i,#ident,&(#seq_range))?;
                     },
                     None => TokenStream::new(),
                 };
@@ -257,7 +257,7 @@ fn validate_new_type(ident: &syn::Ident, ty: &syn::Type, attr: &attr::Variant) -
     let seq_range = match &attr.seq_range {
         Some(seq_range) => {
             quote! {
-                <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(__field0,#ident,&(#seq_range))?;
+                <#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(__field0,#ident,&(#seq_range))?;
             }
         }
         None => TokenStream::new(),
@@ -298,7 +298,7 @@ fn validate_fields(fields: &[ast::Field], is_self: bool) -> TokenStream {
         let seq_range = match &field.attrs.seq_range{
             Some(seq_range) => {
                 quote!{
-                    <&#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#member,#ident_str,&(#seq_range))?;
+                    <#ty as ::zisvalidator::ValidateSeqRange<_,_,_>>::validate_seq_range(#member,#ident_str,&(#seq_range))?;
                 }
             },
             None => TokenStream::new(),

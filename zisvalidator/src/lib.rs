@@ -54,7 +54,12 @@ pub trait ValidateRange<F:?Sized, R,Idx:?Sized>
     fn validate_range(&self, field: &F, range: &R) -> Result<(), error::ValidatorError>;
 }
 
-pub trait ValidateSeqRange<F:?Sized, R,Idx:?Sized>
+pub trait ValidateSeqRange<'a,F:?Sized, R,Idx:?Sized>
 {
-    fn validate_seq_range(self, field: &F, range: &R) -> Result<(), error::ValidatorError>;
+    fn validate_seq_range(&'a self, field: &F, range: &R) -> Result<(), error::ValidatorError>;
+}
+
+pub trait ValidateLength<F:?Sized, R,Idx:?Sized>
+{
+    fn validate_length(&self, field: &F, range: &R) -> Result<(), error::ValidatorError>;
 }
